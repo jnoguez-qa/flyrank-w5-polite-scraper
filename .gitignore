@@ -1,13 +1,6 @@
-# Python
+# Cache & environment
+.data_cache/
 __pycache__/
-*.py[cod]
-.venv/
+*.pyc
 venv/
-
-# Scraper local storage
-cache/
-output/*.json
-
-# IDEs
-.vscode/
-.idea/
+.pytest_cache/

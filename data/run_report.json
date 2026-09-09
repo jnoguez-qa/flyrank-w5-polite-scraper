@@ -1,0 +1,12 @@
+{
+  "status": "SUCCESS",
+  "target": "https://books.toscrape.com/",
+  "total_records_extracted": 60,
+  "pages_scraped": 3,
+  "execution_time_seconds": 1.91,
+  "politeness_settings": {
+    "user_agent": "PoliteScraper/1.0 (+portfolio-project)",
+    "request_delay_seconds": 0.5,
+    "cache_enabled": true
+  }
+}

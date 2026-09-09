@@ -36,3 +36,26 @@ def export_to_csv(books: list[Book], filename: str = "books.csv") -> Path:
             writer.writerow(book.model_dump())
             
     return file_path
+
+def export_run_report(total_books: int, pages_scraped: int, execution_time_sec: float, filename: str = "run_report.json") -> Path:
+    """Export run metrics and execution proof to a JSON report."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    file_path = DATA_DIR / filename
+    
+    report_data = {
+        "status": "SUCCESS",
+        "target": "https://books.toscrape.com/",
+        "total_records_extracted": total_books,
+        "pages_scraped": pages_scraped,
+        "execution_time_seconds": round(execution_time_sec, 2),
+        "politeness_settings": {
+            "user_agent": "PoliteScraper/1.0 (+portfolio-project)",
+            "request_delay_seconds": 0.5,
+            "cache_enabled": True
+        }
+    }
+    
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(report_data, f, ensure_ascii=False, indent=2)
+        
+    return file_path

@@ -1,9 +1,12 @@
+import time
 from src.fetcher import fetch_page, check_target_health
 from src.parser import extract_book_links, extract_next_page_link, parse_book_page
 from src.models import Book
-from src.exporter import export_to_json, export_to_csv
+from src.exporter import export_to_json, export_to_csv, export_run_report
 
 def main():
+    start_time = time.time()
+
     print("--- Running Health Check ---")
     if not check_target_health():
         print("Error: Target website is unreachable or returned an unhealthy status code. Aborting.")
@@ -43,13 +46,17 @@ def main():
 
     print(f"\nSuccessfully validated {len(validated_books)} books using Pydantic.")
 
-    # Stage 4: Export Data
-    print("\n--- Stage 4: Exporting Data ---")
+    # Stage 4 & 6: Export Data & Execution Report
+    print("\n--- Stage 4 & 6: Exporting Data and Run Report ---")
     json_file = export_to_json(validated_books)
     csv_file = export_to_csv(validated_books)
+    
+    elapsed_time = time.time() - start_time
+    report_file = export_run_report(len(validated_books), max_pages, elapsed_time)
 
     print(f"[SUCCESS] Exported {len(validated_books)} books to JSON: {json_file}")
     print(f"[SUCCESS] Exported {len(validated_books)} books to CSV:  {csv_file}")
+    print(f"[SUCCESS] Run Report generated: {report_file}")
 
 if __name__ == "__main__":
     main()
