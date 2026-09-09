@@ -5,16 +5,19 @@ import requests
 from src.config import USER_AGENT, HTTP_TIMEOUT, REQUEST_DELAY, CACHE_DIR
 
 def get_cache_filename(url: str) -> Path:
-    """Generate a readable filename for the cached file based on the URL."""
-    if "page-1.html" in url or url.endswith("books.toscrape.com/") or url.endswith("index.html"):
+    """Generate a unique filename for the cached file based on URL pattern or hash."""
+    # 1. Páginas principales del catálogo
+    if "catalogue/page-1.html" in url or (url.endswith("books.toscrape.com/") and "catalogue" not in url):
         filename = "catalogue-page-1.html"
-    elif "page-2.html" in url:
+    elif "catalogue/page-2.html" in url:
         filename = "catalogue-page-2.html"
-    elif "page-3.html" in url:
+    elif "catalogue/page-3.html" in url:
         filename = "catalogue-page-3.html"
     else:
-        url_hash = hashlib.sha256(url.encode('utf-8')).hexdigest()[:10]
-        filename = f"page-{url_hash}.html"
+        # 2. Páginas de libros individuales (generar hash único)
+        url_hash = hashlib.sha256(url.encode('utf-8')).hexdigest()[:12]
+        filename = f"book-{url_hash}.html"
+        
     return CACHE_DIR / filename
 
 def fetch_page(url: str) -> tuple[str, bool, int]:

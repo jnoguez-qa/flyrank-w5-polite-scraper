@@ -1,6 +1,7 @@
 from src.fetcher import fetch_page, check_target_health
 from src.parser import extract_book_links, extract_next_page_link, parse_book_page
 from src.models import Book
+from src.exporter import export_to_json, export_to_csv
 
 def main():
     print("--- Running Health Check ---")
@@ -41,6 +42,14 @@ def main():
         print(f"[{index}/60] [{status}] Validated: '{book_obj.title}' (£{book_obj.price}) | Rating: {book_obj.rating}/5")
 
     print(f"\nSuccessfully validated {len(validated_books)} books using Pydantic.")
+
+    # Stage 4: Export Data
+    print("\n--- Stage 4: Exporting Data ---")
+    json_file = export_to_json(validated_books)
+    csv_file = export_to_csv(validated_books)
+
+    print(f"[SUCCESS] Exported {len(validated_books)} books to JSON: {json_file}")
+    print(f"[SUCCESS] Exported {len(validated_books)} books to CSV:  {csv_file}")
 
 if __name__ == "__main__":
     main()
