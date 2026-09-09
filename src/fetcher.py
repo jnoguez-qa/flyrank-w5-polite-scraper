@@ -1,12 +1,17 @@
 import hashlib
+import time
 from pathlib import Path
 import requests
-from src.config import USER_AGENT, HTTP_TIMEOUT, CACHE_DIR
+from src.config import USER_AGENT, HTTP_TIMEOUT, REQUEST_DELAY, CACHE_DIR
 
 def get_cache_filename(url: str) -> Path:
     """Generate a readable filename for the cached file based on the URL."""
     if "page-1.html" in url or url.endswith("books.toscrape.com/") or url.endswith("index.html"):
         filename = "catalogue-page-1.html"
+    elif "page-2.html" in url:
+        filename = "catalogue-page-2.html"
+    elif "page-3.html" in url:
+        filename = "catalogue-page-3.html"
     else:
         url_hash = hashlib.sha256(url.encode('utf-8')).hexdigest()[:10]
         filename = f"page-{url_hash}.html"
@@ -24,17 +29,20 @@ def fetch_page(url: str) -> tuple[str, bool, int]:
         html_content = cache_path.read_text(encoding="utf-8")
         return html_content, True, len(html_content.encode("utf-8"))
 
-    # 2. Fetch from network
+    # 2. Polite Delay before network request
+    time.sleep(REQUEST_DELAY)
+
+    # 3. Fetch from network
     headers = {"User-Agent": USER_AGENT}
     response = requests.get(url, headers=headers, timeout=HTTP_TIMEOUT)
 
-    # 3. Verify status code
+    # 4. Verify status code
     if response.status_code != 200:
         raise RuntimeError(f"Fetch failed for {url} with status code {response.status_code}")
 
     html_content = response.text
 
-    # 4. Save to cache
+    # 5. Save to cache
     cache_path.write_text(html_content, encoding="utf-8")
     
     return html_content, False, len(html_content.encode("utf-8"))
