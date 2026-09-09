@@ -41,12 +41,13 @@ def parse_rating(soup: BeautifulSoup) -> int:
     """Extract rating from class names safely (e.g. 'star-rating Three' -> 3)."""
     rating_tag = soup.find("p", class_=re.compile(r"star-rating", re.I))
     if rating_tag:
-        classes = rating_tag.get("classes", [])
+        # Cambiamos "classes" por "class" en la línea 41
+        classes = rating_tag.get("class", [])
         for class_name in classes:
             lower_class = class_name.lower().strip()
             if lower_class in RATING_MAP:
                 return RATING_MAP[lower_class]
-    return 1  # Default fallback to 1 if not parsed, preventing Pydantic validation failure
+    return 1  # Fallback si no se encuentra la clase
 
 def parse_book_page(html_content: str, url: str) -> dict:
     """Extract raw and cleaned product details from a book detail page safely."""

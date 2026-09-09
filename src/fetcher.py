@@ -46,3 +46,16 @@ def fetch_page(url: str) -> tuple[str, bool, int]:
     cache_path.write_text(html_content, encoding="utf-8")
     
     return html_content, False, len(html_content.encode("utf-8"))
+
+def check_target_health(url: str = "https://books.toscrape.com/") -> bool:
+    """Perform a lightweight health check to verify target website availability."""
+    try:
+        headers = {"User-Agent": USER_AGENT}
+        response = requests.head(url, headers=headers, timeout=HTTP_TIMEOUT)
+        if response.status_code == 200:
+            return True
+        # Fallback to GET if HEAD is not allowed by server
+        response = requests.get(url, headers=headers, timeout=HTTP_TIMEOUT)
+        return response.status_code == 200
+    except requests.RequestException:
+        return False

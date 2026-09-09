@@ -1,8 +1,14 @@
-from src.fetcher import fetch_page
+from src.fetcher import fetch_page, check_target_health
 from src.parser import extract_book_links, extract_next_page_link, parse_book_page
 from src.models import Book
 
 def main():
+    print("--- Running Health Check ---")
+    if not check_target_health():
+        print("Error: Target website is unreachable or returned an unhealthy status code. Aborting.")
+        return
+    print("Target website is online and healthy.\n")
+
     current_url = "https://books.toscrape.com/catalogue/page-1.html"
     max_pages = 3
     discovered_links = []
@@ -10,7 +16,6 @@ def main():
 
     print("--- Stage 3: Discovering & Parsing Books ---")
 
-    # 1. Discover Links across 3 pages
     for page_num in range(1, max_pages + 1):
         if not current_url:
             break
@@ -25,14 +30,11 @@ def main():
 
     print(f"\nDiscovered {len(discovered_links)} books. Extracting and validating...\n")
 
-    # 2. Extract and Validate each book using Pydantic
     for index, book_url in enumerate(discovered_links, 1):
-        html, is_cache, size = fetch_page(book_url)
+        html, is_cache, _ = fetch_page(book_url)
         status = "CACHE HIT" if is_cache else "FETCH"
 
         raw_data = parse_book_page(html, book_url)
-        
-        # Pydantic validation
         book_obj = Book(**raw_data)
         validated_books.append(book_obj)
 
